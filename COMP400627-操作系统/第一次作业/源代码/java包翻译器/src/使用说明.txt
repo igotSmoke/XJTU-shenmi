@@ -1,0 +1,3 @@
+在用户端运行CilentRun.java
+在服务器端运行ServerRun.java
+用户端输入hello或你好，将会收到翻译。
