@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车队管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>车队管理系统</h1>
+            <nav>
+                <button onclick="showSection('fleet')">车队管理</button>
+                <button onclick="showSection('vehicle')">车辆管理</button>
+                <button onclick="showSection('driver')">驾驶员管理</button>
+                <button onclick="showSection('drive')">驾驶记录</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 车队管理部分 -->
+            <section id="fleet" class="section">
+                <h2>车队管理</h2>
+                <div class="form-container">
+                    <h3>添加新车队</h3>
+                    <form id="fleetForm">
+                        <input type="text" id="fleetName" placeholder="车队名称" required>
+                        <button type="submit">添加车队</button>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <h3>车队列表</h3>
+                    <table id="fleetTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 车辆管理部分 -->
+            <section id="vehicle" class="section hidden">
+                <h2>车辆管理</h2>
+                <div class="form-container">
+                    <h3>添加新车辆</h3>
+                    <form id="vehicleForm">
+                        <input type="text" id="licensePlate" placeholder="车牌号" required>
+                        <input type="text" id="manufacturer" placeholder="制造商" required>
+                        <input type="date" id="productionDate" required>
+                        <select id="fleetId" required></select>
+                        <button type="submit">添加车辆</button>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <h3>车辆列表</h3>
+                    <table id="vehicleTable">
+                        <thead>
+                            <tr>
+                                <th>车牌号</th>
+                                <th>制造商</th>
+                                <th>生产日期</th>
+                                <th>所属车队</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 驾驶员管理部分 -->
+            <section id="driver" class="section hidden">
+                <h2>驾驶员管理</h2>
+                <div class="form-container">
+                    <h3>添加新驾驶员</h3>
+                    <form id="driverForm">
+                        <input type="text" id="driverName" placeholder="姓名" required>
+                        <input type="tel" id="driverPhone" placeholder="电话" required>
+                        <select id="driverFleetId" required></select>
+                        <input type="text" id="hirePeriod" placeholder="雇佣期限" required>
+                        <button type="submit">添加驾驶员</button>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <h3>驾驶员列表</h3>
+                    <table id="driverTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>电话</th>
+                                <th>所属车队</th>
+                                <th>雇佣期限</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 驾驶记录部分 -->
+            <section id="drive" class="section hidden">
+                <h2>驾驶记录</h2>
+                <div class="form-container">
+                    <h3>添加新驾驶记录</h3>
+                    <form id="driveForm">
+                        <select id="driveDriverId" required></select>
+                        <select id="driveLicensePlate" required></select>
+                        <input type="date" id="driveDate" required>
+                        <input type="number" id="mileage" placeholder="里程数" required>
+                        <button type="submit">添加记录</button>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <h3>驾驶记录列表</h3>
+                    <table id="driveTable">
+                        <thead>
+                            <tr>
+                                <th>驾驶员</th>
+                                <th>车牌号</th>
+                                <th>日期</th>
+                                <th>里程数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 修改车队的模态框 -->
+    <div id="editFleetModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>修改车队</h2>
+            <form id="editFleetForm">
+                <input type="hidden" id="editFleetId">
+                <input type="text" id="editFleetName" placeholder="车队名称" required>
+                <button type="submit">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 修改车辆的模态框 -->
+    <div id="editVehicleModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>修改车辆</h2>
+            <form id="editVehicleForm">
+                <input type="hidden" id="editLicensePlate">
+                <input type="text" id="editManufacturer" placeholder="制造商" required>
+                <input type="date" id="editProductionDate" required>
+                <select id="editFleetId" required></select>
+                <button type="submit">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 修改驾驶员的模态框 -->
+    <div id="editDriverModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>修改驾驶员</h2>
+            <form id="editDriverForm">
+                <input type="hidden" id="editDriverId">
+                <input type="text" id="editDriverName" placeholder="姓名" required>
+                <input type="tel" id="editDriverPhone" placeholder="电话" required>
+                <select id="editDriverFleetId" required></select>
+                <input type="text" id="editHirePeriod" placeholder="雇佣期限" required>
+                <button type="submit">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

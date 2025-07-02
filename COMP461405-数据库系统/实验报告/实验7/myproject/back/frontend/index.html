@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运输管理系统</title>
+    <!-- 引入Element Plus样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <!-- 引入自定义样式 -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <el-container>
+            <el-aside width="200px">
+                <el-menu
+                    :default-active="activeIndex"
+                    class="el-menu-vertical"
+                    @select="handleSelect">
+                    <el-menu-item index="fleets">
+                        <el-icon><van /></el-icon>
+                        <span>车队管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="vehicles">
+                        <el-icon><car /></el-icon>
+                        <span>车辆管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="drivers">
+                        <el-icon><user /></el-icon>
+                        <span>司机管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="drives">
+                        <el-icon><list /></el-icon>
+                        <span>驾驶记录</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
+            <el-main>
+                <!-- 车队管理 -->
+                <div v-if="activeIndex === 'fleets'" class="content-section">
+                    <div class="header">
+                        <h2>车队管理</h2>
+                        <el-button type="primary" @click="showFleetDialog">添加车队</el-button>
+                    </div>
+                    <el-table :data="fleets" style="width: 100%">
+                        <el-table-column prop="fleet_id" label="ID" width="80" />
+                        <el-table-column prop="name" label="车队名称" />
+                        <el-table-column label="操作" width="200">
+                            <template #default="{ row }">
+                                <el-button type="primary" size="small" @click="editFleet(row)">编辑</el-button>
+                                <el-button type="danger" size="small" @click="deleteFleet(row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+                <!-- 车辆管理 -->
+                <div v-if="activeIndex === 'vehicles'" class="content-section">
+                    <div class="header">
+                        <h2>车辆管理</h2>
+                        <el-button type="primary" @click="showVehicleDialog">添加车辆</el-button>
+                    </div>
+                    <el-table :data="vehicles" style="width: 100%">
+                        <el-table-column prop="license_plate" label="车牌号" width="120" />
+                        <el-table-column prop="manufacturer" label="制造商" />
+                        <el-table-column prop="production_date" label="生产日期" width="120" />
+                        <el-table-column prop="fleet_id" label="所属车队" width="100" />
+                        <el-table-column label="操作" width="200">
+                            <template #default="{ row }">
+                                <el-button type="primary" size="small" @click="editVehicle(row)">编辑</el-button>
+                                <el-button type="danger" size="small" @click="deleteVehicle(row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+                <!-- 司机管理 -->
+                <div v-if="activeIndex === 'drivers'" class="content-section">
+                    <div class="header">
+                        <h2>司机管理</h2>
+                        <el-button type="primary" @click="showDriverDialog">添加司机</el-button>
+                    </div>
+                    <el-table :data="drivers" style="width: 100%">
+                        <el-table-column prop="driver_id" label="ID" width="80" />
+                        <el-table-column prop="name" label="姓名" />
+                        <el-table-column prop="phone" label="电话" />
+                        <el-table-column prop="fleet_id" label="所属车队" width="100" />
+                        <el-table-column prop="hire_period" label="雇佣期限" />
+                        <el-table-column label="操作" width="200">
+                            <template #default="{ row }">
+                                <el-button type="primary" size="small" @click="editDriver(row)">编辑</el-button>
+                                <el-button type="danger" size="small" @click="deleteDriver(row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+                <!-- 驾驶记录管理 -->
+                <div v-if="activeIndex === 'drives'" class="content-section">
+                    <div class="header">
+                        <h2>驾驶记录管理</h2>
+                        <el-button type="primary" @click="showDriveDialog">添加记录</el-button>
+                    </div>
+                    <el-table :data="drives" style="width: 100%">
+                        <el-table-column prop="driver_id" label="司机ID" width="80" />
+                        <el-table-column prop="license_plate" label="车牌号" width="120" />
+                        <el-table-column prop="drive_date" label="驾驶日期" width="120" />
+                        <el-table-column prop="mileage" label="里程数" />
+                        <el-table-column label="操作" width="200">
+                            <template #default="{ row }">
+                                <el-button type="primary" size="small" @click="editDrive(row)">编辑</el-button>
+                                <el-button type="danger" size="small" @click="deleteDrive(row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+            </el-main>
+        </el-container>
+
+        <!-- 各种对话框组件 -->
+        <fleet-dialog
+            v-if="showFleetDialogVisible"
+            :visible="showFleetDialogVisible"
+            :fleet="currentFleet"
+            @close="closeFleetDialog"
+            @submit="submitFleet">
+        </fleet-dialog>
+
+        <vehicle-dialog
+            v-if="showVehicleDialogVisible"
+            :visible="showVehicleDialogVisible"
+            :vehicle="currentVehicle"
+            :fleets="fleets"
+            @close="closeVehicleDialog"
+            @submit="submitVehicle">
+        </vehicle-dialog>
+
+        <driver-dialog
+            v-if="showDriverDialogVisible"
+            :visible="showDriverDialogVisible"
+            :driver="currentDriver"
+            :fleets="fleets"
+            @close="closeDriverDialog"
+            @submit="submitDriver">
+        </driver-dialog>
+
+        <drive-dialog
+            v-if="showDriveDialogVisible"
+            :visible="showDriveDialogVisible"
+            :drive="currentDrive"
+            :drivers="drivers"
+            :vehicles="vehicles"
+            @close="closeDriveDialog"
+            @submit="submitDrive">
+        </drive-dialog>
+    </div>
+
+    <!-- 引入Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入Element Plus -->
+    <script src="https://unpkg.com/element-plus"></script>
+    <!-- 引入Element Plus图标 -->
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+    <!-- 引入axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 引入自定义组件 -->
+    <script src="js/components.js"></script>
+    <!-- 引入主应用逻辑 -->
+    <script src="js/app.js"></script>
+</body>
+</html> 
